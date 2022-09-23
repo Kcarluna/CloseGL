@@ -1,5 +1,5 @@
 # OpenGL Practice
-A implementation of [learnopengl]!
+A implementation of learnopengl!
 
 ## Controls
 | Key                 | Description            |
