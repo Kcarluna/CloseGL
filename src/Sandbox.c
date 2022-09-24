@@ -2,6 +2,7 @@
 	#define GL_SILENCE_DEPRECATION
 #endif //__APPLE__
 #include <stdio.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "Window.h"
 #include "Shape.h"
