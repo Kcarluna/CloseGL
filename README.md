@@ -6,6 +6,8 @@ A implementation of learnopengl!
 | ------------------- | ---------------------- |
 | <kbd>space</kbd>    | Toggle shapes          |
 | <kbd>W</kbd>        | Enter wireframe mode   |
+| <kbd>UP</kbd>       | Increase texture mix   |
+| <kbd>DOWN</kbd>     | Decrease texture mix   |
 
 ## Quick Start
 
