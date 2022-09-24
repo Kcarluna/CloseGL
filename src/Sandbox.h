@@ -3,5 +3,6 @@
 
 void run_normal();
 void run_rgb();
+void run_texture();
 
 #endif //_SANDBOX_H_

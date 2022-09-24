@@ -42,17 +42,16 @@ GLuint load_shaders(const char *vert_path, const char *frag_path)
 	glCompileShader(frag_shader);
 
 	GLint success;
+	char log[1024];
 	glGetShaderiv(vert_shader, GL_COMPILE_STATUS, &success);
 	if (!success) {
-		char log[1024];
 		glGetShaderInfoLog(vert_shader, 1024, NULL, log);
-		fprintf(stderr, "ERROR: %s failed: %s\n", vert_path, log);
+		fprintf(stderr, "%s at (%s)\n", log, vert_path);
 	}
 	glGetShaderiv(frag_shader, GL_COMPILE_STATUS, &success);
 	if (!success) {
-		char log[1024];
 		glGetShaderInfoLog(frag_shader, 1024, NULL, log);
-		fprintf(stderr, "ERROR: %s failed: %s\n", frag_path, log);
+		fprintf(stderr, "%s at (%s)\n", log, frag_path);
 	}
 
 	GLuint program = glCreateProgram();
@@ -61,10 +60,8 @@ GLuint load_shaders(const char *vert_path, const char *frag_path)
 	glLinkProgram(program);
 	glGetProgramiv(program, GL_COMPILE_STATUS, &success);
 	if (!success) {
-		char log[1024];
 		glGetProgramInfoLog(program, 1024, NULL, log);
-		fprintf(stderr, "ERROR: The program for %s and %s failed: %s\n", vert_path, frag_path, log);
-		glDeleteProgram(program);
+		fprintf(stderr, "%s at (%s and %s)\n", log, vert_path, frag_path);
 	}
 
 	glDeleteShader(vert_shader);

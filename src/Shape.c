@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "Shader.h"
+#include "Texture.h"
 #include "Shape.h"
 
 void create_triangle(float *vertices, size_t vertices_count, Triangle *triangle)
@@ -44,6 +45,18 @@ void create_rgb_triangle(float *vertices, size_t vertices_count, Triangle *trian
 void render_triangle(Triangle *triangle)
 {
 	glUseProgram(triangle->program);
+
+	glBindVertexArray(triangle->VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+void render_triangle_with_uniform(float val, Triangle *triangle)
+{
+	glUseProgram(triangle->program);
+
+	const char *uniform = "translate";
+	glUniform1f(glGetUniformLocation(triangle->program, uniform), val);
+
 	glBindVertexArray(triangle->VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
@@ -84,7 +97,6 @@ void create_rectangle(float *vertices, size_t vertices_count, GLuint *indices, s
 
 void create_rgb_rectangle(float *vertices, size_t vertices_count, GLuint *indices, size_t indices_count, Rectangle *rectangle)
 {
-
 	glGenVertexArrays(1, &rectangle->VAO);
 	glGenBuffers(1, &rectangle->VBO);
 	glGenBuffers(1, &rectangle->EBO);
@@ -113,10 +125,82 @@ void render_rectangle(Rectangle *rectangle)
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
+void render_rectangle_with_uniform(float val, Rectangle *rectangle)
+{
+	glUseProgram(rectangle->program);
+
+	const char *uniform = "translate";
+	glUniform1f(glGetUniformLocation(rectangle->program, uniform), val);
+
+	glBindVertexArray(rectangle->VAO);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
 void delete_rectangle(Rectangle *rectangle)
 {
 	glDeleteBuffers(1, &rectangle->VBO);
 	glDeleteBuffers(1, &rectangle->EBO);
 	glDeleteVertexArrays(1, &rectangle->VAO);
 	glDeleteProgram(rectangle->program);
+}
+
+void create_textured_rectangle(float *vertices, size_t vertices_count, GLuint *indices, size_t indices_count, Textured_Rectangle *textured_rectangle)
+{
+	glGenVertexArrays(1, &textured_rectangle->VAO);
+	glGenBuffers(1, &textured_rectangle->VBO);
+	glGenBuffers(1, &textured_rectangle->EBO);
+
+	glBindVertexArray(textured_rectangle->VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, textured_rectangle->VBO);
+	glBufferData(GL_ARRAY_BUFFER, vertices_count, vertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, textured_rectangle->EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_count, indices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) 0);
+	glEnableVertexAttribArray(0);
+
+	// NOTE(__LUNA__): More practice on offset and stride.... last val is offset
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	const char *vert_shader  = "../shaders/texture.vert";
+	const char *frag_shader  = "../shaders/texture.frag";
+	textured_rectangle->program = load_shaders(vert_shader, frag_shader);
+
+	textured_rectangle->texture1 = generate_texture("../textures/wood.jpg");
+	textured_rectangle->texture2 = generate_texture("../textures/face.png");
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textured_rectangle->texture1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, textured_rectangle->texture2);
+}
+
+void set_mix(float mix, Textured_Rectangle *textured_rectangle)
+{
+	textured_rectangle->mix = mix;
+}
+
+void render_textured_rectangle(Textured_Rectangle *textured_rectangle)
+{
+	glUseProgram(textured_rectangle->program);
+
+	// NOTE(__LUNA__): Activate program before setting uniforms
+	glUniform1i(glGetUniformLocation(textured_rectangle->program, "texture1"), 0);
+	glUniform1i(glGetUniformLocation(textured_rectangle->program, "texture2"), 1);
+	glUniform1f(glGetUniformLocation(textured_rectangle->program, "mixture"), textured_rectangle->mix);
+
+	glBindVertexArray(textured_rectangle->VAO);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+void delete_textured_rectangle(Textured_Rectangle *textured_rectangle)
+{
+	glDeleteBuffers(1, &textured_rectangle->VBO);
+	glDeleteBuffers(1, &textured_rectangle->EBO);
+	glDeleteVertexArrays(1, &textured_rectangle->VAO);
+	glDeleteProgram(textured_rectangle->program);
 }

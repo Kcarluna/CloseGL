@@ -7,6 +7,7 @@
 #define WIDTH 1024
 #define HEIGHT 768
 
+// FIXME(__LUNA__): Need to implement a system for inputs... input.c
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
 	(void) window;
@@ -14,6 +15,8 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 }
 
 static State state = {0};
+
+float mix = 0.2f;
 
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
@@ -27,21 +30,18 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 		glPolygonMode(GL_FRONT_AND_BACK, (toggle = !toggle) ? GL_LINE : GL_FILL);
 	}
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
-		switch (state) {
-			case ONE: {
-				state = TWO;
-			} break;
-			case TWO: {
-				state = THREE;
-			} break;
-			case THREE: {
-				state = FOUR;
-			} break;
-			case FOUR: {
-				state = ONE;
-			} break;
-			default: {
-			}
+		state++;
+		state = (state == END) ? ONE : state;
+	}
+
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+		if (mix <= 1.0f) {
+			mix += 0.1f;
+		}
+	}
+	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+		if (mix >= 0.1f) {
+			mix -= 0.1f;
 		}
 	}
 }
@@ -49,6 +49,11 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 State current_state()
 {
 	return state;
+}
+
+float current_mix()
+{
+	return mix;
 }
 
 GLFWwindow *create_window()
