@@ -193,16 +193,19 @@ void render_textured_rectangle(Textured_Rectangle *textured_rectangle)
 	glUniform1i(glGetUniformLocation(textured_rectangle->program, "texture2"), 1);
 	glUniform1f(glGetUniformLocation(textured_rectangle->program, "mixture"), textured_rectangle->mix);
 
-	glm::mat4 trans = transform();
+	glm::mat4 trans1 = transform(0.5f, -0.5f, 0.0f);
 	// FIXME(__LUNA__): glGetUniformLocation on mat4 not working...... ARGHHHHH
-	glUniformMatrix4fv(glGetUniformLocation(textured_rectangle->program, "transform"), 1, GL_FALSE, glm::value_ptr(trans));
-
-	GLint num_active_uniforms = 0;
-	glGetProgramiv(textured_rectangle->program, GL_ACTIVE_UNIFORMS, &num_active_uniforms);
-	printf("There are %d uniform(s) active in program.\n", num_active_uniforms);
+	glUniformMatrix4fv(glGetUniformLocation(textured_rectangle->program, "transform"), 1, GL_FALSE, glm::value_ptr(trans1));
 
 	glBindVertexArray(textured_rectangle->VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	glm::mat4 trans2 = transform(-0.5f, 0.5f, 0.0f);
+	glUniformMatrix4fv(glGetUniformLocation(textured_rectangle->program, "transform"), 1, GL_FALSE, glm::value_ptr(trans2));
+
+	glBindVertexArray(textured_rectangle->VAO);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
 }
 
 void delete_textured_rectangle(Textured_Rectangle *textured_rectangle)
