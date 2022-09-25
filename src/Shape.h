@@ -37,4 +37,7 @@ void set_mix(float mix, Textured_Rectangle *textured_rectangle);
 void render_textured_rectangle(Textured_Rectangle *textured_rectangle);
 void delete_textured_rectangle(Textured_Rectangle *textured_rectangle);
 
+void create_textured_rectangle_3d(float *vertices, size_t vertices_count, GLuint *indices, size_t indices_count, Textured_Rectangle *textured_rectangle);
+void render_textured_rectangle_3d(Textured_Rectangle *textured_rectangle);
+
 #endif //_SHAPES_H_

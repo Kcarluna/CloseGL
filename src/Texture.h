@@ -3,5 +3,6 @@
 #include <glad/glad.h>
 
 GLuint generate_texture(const char *file_path);
+GLuint generate_texture_3d(const char *file_path);
 
 #endif //_TEXTURE_H_

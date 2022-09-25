@@ -6,6 +6,8 @@ int main()
 {
 //	run_normal();
 //	run_rgb();
-	run_texture();
+	// NOTE(__LUNA__): Don't work on mac :(
+//	run_texture();
+	run_texture_3d();
 	return 0;
 }

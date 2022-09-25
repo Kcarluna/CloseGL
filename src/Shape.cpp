@@ -205,7 +205,6 @@ void render_textured_rectangle(Textured_Rectangle *textured_rectangle)
 
 	glBindVertexArray(textured_rectangle->VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
 }
 
 void delete_textured_rectangle(Textured_Rectangle *textured_rectangle)
@@ -214,4 +213,49 @@ void delete_textured_rectangle(Textured_Rectangle *textured_rectangle)
 	glDeleteBuffers(1, &textured_rectangle->EBO);
 	glDeleteVertexArrays(1, &textured_rectangle->VAO);
 	glDeleteProgram(textured_rectangle->program);
+}
+
+void create_textured_rectangle_3d(float *vertices, size_t vertices_count, GLuint *indices, size_t indices_count, Textured_Rectangle *textured_rectangle)
+{
+	glGenVertexArrays(1, &textured_rectangle->VAO);
+	glGenBuffers(1, &textured_rectangle->VBO);
+	glGenBuffers(1, &textured_rectangle->EBO);
+
+	glBindVertexArray(textured_rectangle->VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, textured_rectangle->VBO);
+	glBufferData(GL_ARRAY_BUFFER, vertices_count, vertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, textured_rectangle->EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_count, indices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) 0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	const char *vert_shader = "../shaders/texture_3d.vert";
+	const char *frag_shader = "../shaders/texture_3d.frag";
+	textured_rectangle->program = load_shaders(vert_shader, frag_shader);
+
+	textured_rectangle->texture1 = generate_texture_3d("../textures/wood.jpg");
+	textured_rectangle->texture2 = generate_texture_3d("../textures/face.png");
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textured_rectangle->texture1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, textured_rectangle->texture2);
+
+	textured_rectangle->mix = 0.2f;
+}
+void render_textured_rectangle_3d(Textured_Rectangle *textured_rectangle)
+{
+	glUseProgram(textured_rectangle->program);
+
+	// TODO(__LUNA__): Create separate texture function for texture1... remove GL_CLAMP_TO_EDGE
+	glUniform1i(glGetUniformLocation(textured_rectangle->program, "texture1"), 0);
+	glUniform1i(glGetUniformLocation(textured_rectangle->program, "texture2"), 1);
+	glUniform1f(glGetUniformLocation(textured_rectangle->program, "mixture"), textured_rectangle->mix);
+
+	glBindVertexArray(textured_rectangle->VAO);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
