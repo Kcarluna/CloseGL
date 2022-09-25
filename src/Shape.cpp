@@ -194,7 +194,7 @@ void render_textured_rectangle(Textured_Rectangle *textured_rectangle)
 	glUniform1f(glGetUniformLocation(textured_rectangle->program, "mixture"), textured_rectangle->mix);
 
 	glm::mat4 trans1 = transform(0.5f, -0.5f, 0.0f);
-	// FIXME(__LUNA__): glGetUniformLocation on mat4 not working...... ARGHHHHH
+	// FIXME(__LUNA__): glGetUniformLocation on mat4 not working...... ARGHHHHH | Macos doesn't like mat4 uniforms
 	glUniformMatrix4fv(glGetUniformLocation(textured_rectangle->program, "transform"), 1, GL_FALSE, glm::value_ptr(trans1));
 
 	glBindVertexArray(textured_rectangle->VAO);
