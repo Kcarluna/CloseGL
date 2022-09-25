@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <iostream>
 #include "Shader.h"
 #include "Texture.h"
+#include "Math.hpp"
 #include "Shape.h"
 
 void create_triangle(float *vertices, size_t vertices_count, Triangle *triangle)
@@ -54,8 +56,7 @@ void render_triangle_with_uniform(float val, Triangle *triangle)
 {
 	glUseProgram(triangle->program);
 
-	const char *uniform = "translate";
-	glUniform1f(glGetUniformLocation(triangle->program, uniform), val);
+	glUniform1f(glGetUniformLocation(triangle->program, "translate"), val);
 
 	glBindVertexArray(triangle->VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -129,8 +130,7 @@ void render_rectangle_with_uniform(float val, Rectangle *rectangle)
 {
 	glUseProgram(rectangle->program);
 
-	const char *uniform = "translate";
-	glUniform1f(glGetUniformLocation(rectangle->program, uniform), val);
+	glUniform1f(glGetUniformLocation(rectangle->program, "translate"), val);
 
 	glBindVertexArray(rectangle->VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -192,6 +192,14 @@ void render_textured_rectangle(Textured_Rectangle *textured_rectangle)
 	glUniform1i(glGetUniformLocation(textured_rectangle->program, "texture1"), 0);
 	glUniform1i(glGetUniformLocation(textured_rectangle->program, "texture2"), 1);
 	glUniform1f(glGetUniformLocation(textured_rectangle->program, "mixture"), textured_rectangle->mix);
+
+	glm::mat4 trans = transform();
+	// FIXME(__LUNA__): glGetUniformLocation on mat4 not working...... ARGHHHHH
+	glUniformMatrix4fv(glGetUniformLocation(textured_rectangle->program, "transform"), 1, GL_FALSE, glm::value_ptr(trans));
+
+	GLint num_active_uniforms = 0;
+	glGetProgramiv(textured_rectangle->program, GL_ACTIVE_UNIFORMS, &num_active_uniforms);
+	printf("There are %d uniform(s) active in program.\n", num_active_uniforms);
 
 	glBindVertexArray(textured_rectangle->VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

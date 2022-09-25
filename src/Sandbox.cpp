@@ -12,9 +12,9 @@ void run_normal()
 {
 	GLFWwindow *window = create_window();
 
-	Triangle triangle_one = {0};
-	Triangle triangle_two = {0};
-	Rectangle rectangle = {0};
+	Triangle triangle_one = {};
+	Triangle triangle_two = {};
+	Rectangle rectangle = {};
 
 	float triangle_one_vertices[] = {
 		// positions
@@ -85,9 +85,9 @@ void run_rgb()
 {
 	GLFWwindow *window = create_window();
 
-	Triangle left_triangle = {0};
-	Triangle right_triangle = {0};
-	Rectangle rectangle = {0};
+	Triangle left_triangle = {};
+	Triangle right_triangle = {};
+	Rectangle rectangle = {};
 
 	float left_triangle_vertices[] = {
 		// positions        // colors
@@ -139,8 +139,6 @@ void run_rgb()
 				render_triangle(&left_triangle);
 				render_rectangle(&rectangle);
 			} break;
-			default: {
-			}
 		}
 
 		glfwSwapBuffers(window);
@@ -158,7 +156,7 @@ void run_texture()
 {
 	GLFWwindow *window = create_window();
 
-	Textured_Rectangle textured_rectangle = {0};
+	Textured_Rectangle textured_rectangle = {};
 
 	float vertices[] = {
 		 // positions         // colors           // texture coords (s, t) | Increasing s\t 'duplicates' textures

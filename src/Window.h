@@ -8,7 +8,6 @@ typedef enum {
 	TWO,
 	THREE,
 	FOUR,
-	END,
 } State;
 
 State current_state();

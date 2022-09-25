@@ -14,7 +14,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-static State state = {0};
+static State state = {};
 
 float mix = 0.2f;
 
@@ -30,8 +30,20 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 		glPolygonMode(GL_FRONT_AND_BACK, (toggle = !toggle) ? GL_LINE : GL_FILL);
 	}
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
-		state++;
-		state = (state == END) ? ONE : state;
+		switch (state) {
+			case ONE: {
+				state = TWO;
+			} break;
+			case TWO: {
+				state = THREE;
+			} break;
+			case THREE: {
+				state = FOUR;
+			} break;
+			case FOUR: {
+				state = ONE;
+			} break;
+		}
 	}
 
 	if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
