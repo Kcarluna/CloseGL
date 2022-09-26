@@ -37,7 +37,16 @@ void set_mix(float mix, Textured_Rectangle *textured_rectangle);
 void render_textured_rectangle(Textured_Rectangle *textured_rectangle);
 void delete_textured_rectangle(Textured_Rectangle *textured_rectangle);
 
-void create_textured_rectangle_3d(float *vertices, size_t vertices_count, GLuint *indices, size_t indices_count, Textured_Rectangle *textured_rectangle);
-void render_textured_rectangle_3d(Textured_Rectangle *textured_rectangle);
+typedef struct {
+	GLuint VAO, VBO;
+	GLuint program;
+	GLuint texture1, texture2;
+	float mix;
+} Textured_Rectangle_3d;
+
+void create_textured_rectangle_3d(float *vertices, size_t vertices_count, Textured_Rectangle_3d *textured_rectangle_3d);
+void set_mix_3d(float mix, Textured_Rectangle_3d *textured_rectangle_3d);
+void render_textured_rectangle_3d(int w, int h, Textured_Rectangle_3d *textured_rectangle_3d);
+void delete_textured_rectangle_3d(Textured_Rectangle_3d *textured_rectangle_3d);
 
 #endif //_SHAPES_H_
