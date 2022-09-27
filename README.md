@@ -1,5 +1,5 @@
 # OpenGL Practice
-A implementation of learnopengl!
+A implementation of CloseGL!
 
 ## Controls
 | Key                 | Description            |
@@ -13,9 +13,9 @@ A implementation of learnopengl!
 
 Dependencies: [glad], [glfw]
 ```console
-$ cd OpenGlPractice/src/
+$ cd CloseGL/src/
 $ make
-$ ./OpenGLPractice
+$ ./CloseGL
 ```
 
 ## Resource:
