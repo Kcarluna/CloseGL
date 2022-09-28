@@ -249,6 +249,7 @@ void run_texture_3d()
 
 		set_mix_3d(current_mix(), &textured_rectangle_3d);
 
+		// NOTE(__LUNA__): w/h for projection matrix
 		int width, height;
 		glfwGetWindowSize(window, &width, &height);
 		render_textured_rectangle_3d(width, height, &textured_rectangle_3d);
@@ -258,6 +259,100 @@ void run_texture_3d()
 	}
 
 	delete_textured_rectangle_3d(&textured_rectangle_3d);
+
+	glfwTerminate();
+}
+
+void run_textured_3d_camera()
+{
+	GLFWwindow *window = create_window();
+
+	Textured_Rectangle_3d_camera textured_rectangle_3d_camera = {};
+
+	float vertices[] = {
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+	};
+
+	create_textured_rectangle_3d_camera(vertices, sizeof(vertices), &textured_rectangle_3d_camera);
+
+	// NOTE(__LUNA__): Need a new system for dt
+	float last = 0.0f;
+	while (!glfwWindowShouldClose(window)) {
+		float current = glfwGetTime();
+		float dt = current - last;
+		last = current;
+
+		// NOTE(__LUNA__): Convert dt into FPS
+		//printf(%f\n", 1 / dt);
+
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		set_mix_3d_camera(current_mix(), &textured_rectangle_3d_camera);
+		if (move_up(window)) {
+			move_camera(UP, dt, &textured_rectangle_3d_camera);
+		}
+		if (move_down(window)) {
+			move_camera(DOWN, dt, &textured_rectangle_3d_camera);
+		}
+		if (move_left(window)) {
+			move_camera(LEFT, dt, &textured_rectangle_3d_camera);
+		}
+		if (move_right(window)) {
+			move_camera(RIGHT, dt, &textured_rectangle_3d_camera);
+		}
+
+		MousePos mouse = current_mouse_pos();
+		update_camera(mouse.offsetX, mouse.offsetY, &textured_rectangle_3d_camera);
+
+		int width, height;
+		glfwGetWindowSize(window, &width, &height);
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	}
+
+	delete_textured_rectangle_3d_camera(&textured_rectangle_3d_camera);
 
 	glfwTerminate();
 }

@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <glad/glad.h>
 #include "Window.h"
 
@@ -29,6 +28,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_W && action == GLFW_PRESS) {
 		glPolygonMode(GL_FRONT_AND_BACK, (toggle = !toggle) ? GL_LINE : GL_FILL);
 	}
+	// NOTE(__LUNA__): For normal and rgb only
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
 		switch (state) {
 			case ONE: {
@@ -58,6 +58,29 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 	}
 }
 
+MousePos mouse = {};
+
+// FIXME(__LUNA__): There seems to be some mouse drifting happening...
+void cursor_callback(GLFWwindow *window, double xPos, double yPos)
+{
+	int w, h;
+	glfwGetWindowSize(window , &w, &h);
+	static float lastX = w, lastY = h;
+
+	static bool firstMouse = true;
+	if (firstMouse) {
+		lastX = xPos;
+		lastY = yPos;
+		firstMouse = false;
+	}
+
+	const float sensitivity = 0.1f;
+	mouse.offsetX = (xPos - lastX) * sensitivity;
+	mouse.offsetY = (lastY - yPos) * sensitivity;
+	lastX = xPos;
+	lastY = yPos;
+}
+
 State current_state()
 {
 	return state;
@@ -66,6 +89,11 @@ State current_state()
 float current_mix()
 {
 	return mix;
+}
+
+MousePos create_mouse_pos()
+{
+	return mouse;
 }
 
 GLFWwindow *create_window()
@@ -91,6 +119,10 @@ GLFWwindow *create_window()
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetKeyCallback(window, key_callback);
 
+	// NOTE(__LUNA__): Disable on-screen cursor
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, cursor_callback);
+
 	if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
 		fprintf(stderr, "ERROR: Failed to initialize GLAD\n");
 		glfwTerminate();
@@ -98,4 +130,37 @@ GLFWwindow *create_window()
 	}
 
 	return window;
+}
+
+// NOTE(__LUNA__): For camera movement
+bool move_up(GLFWwindow *window)
+{
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		return true;
+	}
+	return false;
+}
+
+bool move_down(GLFWwindow *window)
+{
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		return true;
+	}
+	return false;
+}
+
+bool move_left(GLFWwindow *window)
+{
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		return true;
+	}
+	return false;
+}
+
+bool move_right(GLFWwindow *window)
+{
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		return true;
+	}
+	return false;
 }

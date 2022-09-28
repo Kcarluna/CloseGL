@@ -1,6 +1,10 @@
 #ifndef _SHAPES_H_
 #define _SHAPES_H_
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 typedef struct {
 	GLuint VAO, VBO;
 	GLuint program;
@@ -48,5 +52,20 @@ void create_textured_rectangle_3d(float *vertices, size_t vertices_count, Textur
 void set_mix_3d(float mix, Textured_Rectangle_3d *textured_rectangle_3d);
 void render_textured_rectangle_3d(int w, int h, Textured_Rectangle_3d *textured_rectangle_3d);
 void delete_textured_rectangle_3d(Textured_Rectangle_3d *textured_rectangle_3d);
+
+typedef struct {
+	GLuint VAO, VBO;
+	GLuint program;
+	GLuint texture1, texture2;
+	float mix;
+	glm::vec3 cameraPos, cameraFront, cameraUp;
+} Textured_Rectangle_3d_camera;
+
+void create_textured_rectangle_3d_camera(float *vertices, size_t vertices_count, Textured_Rectangle_3d_camera *textured_rectangle_3d_camera);
+void set_mix_3d_camera(float mix, Textured_Rectangle_3d_camera *textured_rectangle_3d_camera);
+void update_camera(float x, float y, Textured_Rectangle_3d_camera *textured_rectangle_3d_camera);
+void move_camera(int dir, int dt, Textured_Rectangle_3d_camera *textured_rectangle_3d_camera);
+void render_textured_rectangle_3d_camera(int w, int h, Textured_Rectangle_3d_camera *textured_rectangle_3d_camera);
+void delete_textured_rectangle_3d_camera(Textured_Rectangle_3d_camera *textured_rectangle_3d_camera);
 
 #endif //_SHAPES_H_

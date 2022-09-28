@@ -5,9 +5,13 @@ A implementation of CloseGL!
 | Key                 | Description            |
 | ------------------- | ---------------------- |
 | <kbd>space</kbd>    | Toggle shapes          |
-| <kbd>W</kbd>        | Enter wireframe mode   |
+| <kbd>M</kbd>        | Enter wireframe mode   |
 | <kbd>UP</kbd>       | Increase texture mix   |
 | <kbd>DOWN</kbd>     | Decrease texture mix   |
+| <kbd>W</kbd>        | Move up                |
+| <kbd>A</kbd>        | Move left              |
+| <kbd>S</kbd>        | Move down              |
+| <kbd>D</kbd>        | Move right             |
 
 ## Quick Start
 

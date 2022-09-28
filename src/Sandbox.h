@@ -5,5 +5,6 @@ void run_normal();
 void run_rgb();
 void run_texture();
 void run_texture_3d();
+void run_texture_3d_camera();
 
 #endif //_SANDBOX_H_

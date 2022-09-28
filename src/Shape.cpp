@@ -307,3 +307,141 @@ void delete_textured_rectangle_3d(Textured_Rectangle_3d *textured_rectangle_3d)
 	glDeleteVertexArrays(1, &textured_rectangle_3d->VAO);
 	glDeleteProgram(textured_rectangle_3d->program);
 }
+
+void create_textured_rectangle_3d_camera(float *vertices, size_t vertices_count, Textured_Rectangle_3d_camera *textured_rectangle_3d_camera)
+{
+	glGenVertexArrays(1, &textured_rectangle_3d_camera->VAO);
+	glGenBuffers(1, &textured_rectangle_3d_camera->VBO);
+
+	glBindVertexArray(textured_rectangle_3d_camera->VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, textured_rectangle_3d_camera->VAO);
+	glBufferData(GL_ARRAY_BUFFER, vertices_count, vertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) 0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	const char *vert_shader = "./shaders/texture_3d.vert";
+	const char *frag_shader = "./shaders/texture_3d.frag";
+	textured_rectangle_3d_camera->program = load_shaders(vert_shader, frag_shader);
+
+	textured_rectangle_3d_camera->texture1 = generate_texture_3d("../textures/wood.jpg");
+	textured_rectangle_3d_camera->texture2 = generate_texture_3d("../textures/face.png");
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textured_rectangle_3d_camera->texture1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, textured_rectangle_3d_camera->texture2);
+
+	textured_rectangle_3d_camera->mix = 0.2f;
+
+	glEnable(GL_DEPTH_TEST);
+
+	// NOTE(__LUNA__): Set default camera positions
+	textured_rectangle_3d_camera->cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+	textured_rectangle_3d_camera->cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	textured_rectangle_3d_camera->cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+}
+
+void set_mix_3d_camera(float mix, Textured_Rectangle_3d_camera *textured_rectangle_3d_camera)
+{
+	textured_rectangle_3d_camera->mix = mix;
+}
+
+void update_camera(float x, float y, Textured_Rectangle_3d_camera *textured_rectangle_3d_camera)
+{
+	static float yaw = -90.0f;
+	static float pitch = 0.0f;
+
+	yaw += x;
+	pitch += y;
+	if (pitch >= 89.0f) {
+		pitch = 89.0f;
+	}
+	if (pitch <= -89.0f) {
+		pitch = -89.0f;
+	}
+
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction.y = sin(glm::radians(pitch));
+	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+
+	textured_rectangle_3d_camera->cameraFront = glm::normalize(direction);
+}
+
+void move_camera(int dir, float dt, Textured_Rectangle_3d_camera *textured_rectangle_3d_camera)
+{
+	const float camera_speed = 2.5f * dt;
+	switch (dir) {
+		case 1: {
+			// NOTE(__LUNA__): Move UP
+			textured_rectangle_3d_camera->cameraPos += camera_speed * textured_rectangle_3d_camera->cameraFront;
+		} break;
+		case 2: {
+			// NOTE(__LUNA__): Move DOWN
+			textured_rectangle_3d_camera->cameraPos -= camera_speed * textured_rectangle_3d_camera->cameraFront;
+		} break;
+		case 3: {
+			// NOTE(__LUNA__): Move LEFT
+			textured_rectangle_3d_camera->cameraPos -= glm::normalize(glm::cross(textured_rectangle_3d_camera->cameraFront, textured_rectangle_3d_camera->cameraUp)) * camera_speed;
+		} break;
+		case 4: {
+			// NOTE(__LUNA__): Move RIGHT
+			textured_rectangle_3d_camera->cameraPos += glm::normalize(glm::cross(textured_rectangle_3d_camera->cameraFront, textured_rectangle_3d_camera->cameraUp)) * camera_speed;
+		} break;
+	}
+}
+
+void render_textured_rectangle_3d_camera(int w, int h, Textured_Rectangle_3d_camera *textured_rectangle_3d_camera)
+{
+	glUseProgram(textured_rectangle_3d_camera->program);
+
+	glUniform1i(glGetUniformLocation(textured_rectangle_3d_camera->program, "texture1"), 0);
+	glUniform1i(glGetUniformLocation(textured_rectangle_3d_camera->program, "texture2"), 0);
+	glUniform1i(glGetUniformLocation(textured_rectangle_3d_camera->program, "mixture"), textured_rectangle_3d_camera->mix);
+
+	// NOTE(__LUNA__): Interactable_camera_matrix
+	glm::mat4 view = interactable_camera_matrix(textured_rectangle_3d_camera->cameraPos,
+												textured_rectangle_3d_camera->cameraFront,
+												textured_rectangle_3d_camera->cameraUp);
+	glm::mat4 proj = projection_matrix(45.0f, (float) w / (float) h, 0.1f, 100.0f);
+
+	glUniformMatrix4fv(glGetUniformLocation(textured_rectangle_3d_camera->program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(textured_rectangle_3d_camera->program, "projection"), 1, GL_FALSE, glm::value_ptr(proj));
+
+	glm::vec3 cubePositions[] = {
+		glm::vec3( 0.0f,  0.0f,  0.0f), 
+		glm::vec3( 2.0f,  5.0f, -15.0f), 
+		glm::vec3(-1.5f, -2.2f, -2.5f),  
+		glm::vec3(-3.8f, -2.0f, -12.3f),  
+		glm::vec3( 2.4f, -0.4f, -3.5f),  
+		glm::vec3(-1.7f,  3.0f, -7.5f),  
+		glm::vec3( 1.3f, -2.0f, -2.5f),  
+		glm::vec3( 1.5f,  2.0f, -2.5f), 
+		glm::vec3( 1.5f,  0.2f, -1.5f), 
+		glm::vec3(-1.3f,  1.0f, -1.5f)  
+	};
+
+	for (size_t i = 0; i < sizeof(cubePositions) / sizeof(cubePositions[0]); i++) {
+		if (i % 3 == 0) {
+			float angle = sin(glfwGetTime()) * 25.0f;
+			glm::mat4 model = model_matrix(angle, cubePositions[i].x, cubePositions[i].y, cubePositions[i].z);
+			glUniformMatrix4fv(glGetUniformLocation(textured_rectangle_3d_camera->program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		} else {
+			glm::mat4 model = model_matrix(20.0f * i, cubePositions[i].x, cubePositions[i].y, cubePositions[i].z);
+			glUniformMatrix4fv(glGetUniformLocation(textured_rectangle_3d_camera->program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		}
+		glBindVertexArray(textured_rectangle_3d_camera->VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+}
+
+void delete_textured_rectangle_3d_camera(Textured_Rectangle_3d_camera *textured_rectangle_3d_camera)
+{
+	glDeleteBuffers(1, &textured_rectangle_3d_camera->VBO);
+	glDeleteVertexArrays(1, &textured_rectangle_3d_camera->VAO);
+	glDeleteProgram(textured_rectangle_3d_camera->program);
+}
