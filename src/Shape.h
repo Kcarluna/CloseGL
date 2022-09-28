@@ -64,7 +64,7 @@ typedef struct {
 void create_textured_rectangle_3d_camera(float *vertices, size_t vertices_count, Textured_Rectangle_3d_camera *textured_rectangle_3d_camera);
 void set_mix_3d_camera(float mix, Textured_Rectangle_3d_camera *textured_rectangle_3d_camera);
 void update_camera(float x, float y, Textured_Rectangle_3d_camera *textured_rectangle_3d_camera);
-void move_camera(int dir, int dt, Textured_Rectangle_3d_camera *textured_rectangle_3d_camera);
+void move_camera(int dir, float dt, Textured_Rectangle_3d_camera *textured_rectangle_3d_camera);
 void render_textured_rectangle_3d_camera(int w, int h, Textured_Rectangle_3d_camera *textured_rectangle_3d_camera);
 void delete_textured_rectangle_3d_camera(Textured_Rectangle_3d_camera *textured_rectangle_3d_camera);
 

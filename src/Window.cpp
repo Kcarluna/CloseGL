@@ -91,7 +91,7 @@ float current_mix()
 	return mix;
 }
 
-MousePos create_mouse_pos()
+MousePos current_mouse_pos()
 {
 	return mouse;
 }

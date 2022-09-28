@@ -263,7 +263,7 @@ void run_texture_3d()
 	glfwTerminate();
 }
 
-void run_textured_3d_camera()
+void run_texture_3d_camera()
 {
 	GLFWwindow *window = create_window();
 
